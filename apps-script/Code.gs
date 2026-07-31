@@ -15,6 +15,10 @@ function createFormFromSpec() {
     addQuestion(form, question);
   });
 
+  if (spec.caseName) {
+    PropertiesService.getScriptProperties().setProperty('form_' + spec.caseName, form.getId());
+  }
+
   var editUrl = form.getEditUrl();
   var publishedUrl = form.getPublishedUrl();
   Logger.log('Edit URL: ' + editUrl);

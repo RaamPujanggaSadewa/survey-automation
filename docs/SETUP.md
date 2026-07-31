@@ -1,7 +1,9 @@
 # Setup
 
-One-time setup to let `scripts/generate-form.sh` (or the Gemini CLI) push
-specs to Apps Script and create Google Forms.
+One-time setup to let `scripts/generate-form.sh`, `scripts/fetch-responses.sh`,
+`scripts/generate-slides.sh` (or the Gemini CLI) push to Apps Script and
+create Google Forms / Slides — all three run against the same Apps Script
+project set up below.
 
 ## 1. Install clasp
 
@@ -47,16 +49,22 @@ clasp push
 clasp run createFormFromSpec
 ```
 
-Or use `scripts/generate-form.sh <case-name>` from the repo root, which does
-the copy/push/run in one step.
+Or use the wrapper scripts from the repo root, which do the copy/push/run in
+one step:
 
-The first `clasp run` may prompt you to authorize the script (it needs
-permission to create Forms in your Drive).
+- `scripts/generate-form.sh <case-name>` — builds the Google Form
+- `scripts/fetch-responses.sh <case-name>` — pulls back that form's responses as JSON
+- `scripts/generate-slides.sh <case-name>` — builds the Google Slides deck
+
+The first `clasp run` of each function may prompt you to authorize the
+script (it needs permission to create Forms/Slides and read form responses
+in your Drive).
 
 ## Using the Gemini CLI instead of running clasp by hand
 
 The Gemini CLI can shell out to `clasp` the same way you would manually —
-point it at this repo and ask it to run `scripts/generate-form.sh
-<case-name>` (or the underlying `clasp push` / `clasp run` commands) once
-the case's spec file exists in `specs/`. It needs the same one-time login
-(steps 1–4 above) done on the machine/environment it runs in.
+point it at this repo and ask it to run the wrapper script for whichever
+step you're on (form creation, fetching responses, or slides creation), or
+the underlying `clasp push` / `clasp run` commands directly. It needs the
+same one-time login (steps 1–4 above) done on the machine/environment it
+runs in.
