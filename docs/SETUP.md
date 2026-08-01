@@ -1,70 +1,46 @@
 # Setup
 
-One-time setup to let `scripts/generate-form.sh`, `scripts/fetch-responses.sh`,
-`scripts/generate-slides.sh` (or the Gemini CLI) push to Apps Script and
-create Google Forms / Slides — all three run against the same Apps Script
-project set up below.
+No CLI, no login, no local Apps Script project to maintain. Each script in
+`specs/` is self-contained — you paste it into the Apps Script web editor
+and run it there.
 
-## 1. Install clasp
+## Running a `.form.gs`, `.responses.gs`, or `.slides.gs` script
 
-`clasp` is Google's CLI for pushing code to Apps Script projects.
+1. Go to [script.google.com](https://script.google.com) and click **New project**.
+2. Delete the placeholder code in the editor.
+3. Open the relevant file from `specs/` and paste its entire contents in.
+4. At the top of the editor, pick the function to run from the dropdown
+   next to the **Run** button:
+   - `createForm` for a `.form.gs` file
+   - `exportResponses` for a `.responses.gs` file
+   - `createSlides` for a `.slides.gs` file
+5. Click **Run**.
+6. The first time you run a given script, Google will prompt you to
+   authorize it (it needs permission to create/read Forms or Slides in
+   your Drive). Review and allow it.
+7. Open **View → Logs** (or **Execution log**) to see the output — the
+   form/deck URLs, or the exported responses JSON.
 
-```bash
-npm install -g @google/clasp
+You can rename the project (top left) to whatever's convenient — it
+doesn't need to persist between steps, and you can throw it away and paste
+a fresh script next time.
+
+## Getting the form ID for the responses step
+
+After `createForm()` runs, the logged edit URL looks like:
+
+```
+https://docs.google.com/forms/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/edit
 ```
 
-## 2. Enable the Apps Script API
+The part between `/d/` and `/edit` is the form ID. Paste that into the
+`FORM_ID` constant at the top of the `.responses.gs` script an AI generates
+for you.
 
-Visit https://script.google.com/home/usersettings and turn on the
-**Google Apps Script API** toggle for your Google account. Without this,
-`clasp` cannot create or push to script projects.
+## Using Gemini CLI (or any AI assistant) in this workflow
 
-## 3. Log in
-
-```bash
-clasp login
-```
-
-This opens a browser OAuth flow and stores credentials locally
-(`~/.clasprc.json`) — it is not part of this repo.
-
-## 4. Create the Apps Script project
-
-From the repo root:
-
-```bash
-cd apps-script
-clasp create --title "Survey Automation" --type standalone --rootDir .
-```
-
-This generates a `.clasp.json` in `apps-script/` containing your project's
-`scriptId`. It's user-specific, so it's git-ignored — anyone forking this
-repo runs this step themselves to get their own script project.
-
-## 5. Push and run
-
-```bash
-cd apps-script
-clasp push
-clasp run createFormFromSpec
-```
-
-Or use the wrapper scripts from the repo root, which do the copy/push/run in
-one step:
-
-- `scripts/generate-form.sh <case-name>` — builds the Google Form
-- `scripts/fetch-responses.sh <case-name>` — pulls back that form's responses as JSON
-- `scripts/generate-slides.sh <case-name>` — builds the Google Slides deck
-
-The first `clasp run` of each function may prompt you to authorize the
-script (it needs permission to create Forms/Slides and read form responses
-in your Drive).
-
-## Using the Gemini CLI instead of running clasp by hand
-
-The Gemini CLI can shell out to `clasp` the same way you would manually —
-point it at this repo and ask it to run the wrapper script for whichever
-step you're on (form creation, fetching responses, or slides creation), or
-the underlying `clasp push` / `clasp run` commands directly. It needs the
-same one-time login (steps 1–4 above) done on the machine/environment it
-runs in.
+Gemini CLI does not connect to Google Forms/Slides directly — there's no
+API integration it can drive on your behalf. Its role here is to *write*
+the script (reading a case file, or later a responses export, and
+producing the matching `.gs` file in `specs/`). You still do the
+paste-and-run step yourself in the Apps Script editor, as described above.

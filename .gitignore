@@ -1,4 +1,2 @@
-apps-script/.clasp.json
-node_modules/
 .DS_Store
 responses/*.json
