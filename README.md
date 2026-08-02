@@ -46,9 +46,12 @@ Google Form (live, in your Drive)
         |
         v  (AI writes specs/<case>.responses.gs with the form ID filled in)
         v  paste into script.google.com, run exportResponses()
-responses/<case>.json              -- raw response export, copied from the execution log
+responses/<case>.json (or .csv)     -- raw response export
         |
         v  (AI reads the responses + original case file)
+synthesis/<case>.md                -- AI-written findings: key results, quotes, recommendations
+        |
+        v  (AI turns the findings into slide content)
 specs/<case>.slides.gs             -- AI-generated, self-contained slides script
         |
         v  paste into script.google.com, run createSlides()
@@ -61,8 +64,20 @@ Google Slides deck (live, in your Drive)
 - `specs/` — AI output per case: `<case>.form.gs`, `<case>.responses.gs`,
   `<case>.slides.gs` — each a complete script you paste and run, see
   `specs/README.md` for all three formats.
-- `responses/` — raw response exports per case (git-ignored, respondent data).
+- `responses/` — raw response exports per case (`.json` git-ignored by
+  default, `.csv` fine to keep as a worked example — see below).
+- `synthesis/` — AI-written findings per case, ahead of building the slides.
 - `docs/SETUP.md` — how to paste/run a script in the Apps Script editor.
+
+## Worked example: shuttle-pickup-location
+
+A real case run through the whole pipeline — from a UX question about a
+bus-booking app's UI to a published survey to synthesized findings:
+
+- [`cases/shuttle-pickup-location.md`](cases/shuttle-pickup-location.md) — the condition and research goal
+- [`specs/shuttle-pickup-location.form.gs`](specs/shuttle-pickup-location.form.gs) — the script that built the Google Form
+- [`responses/shuttle-pickup-location.csv`](responses/shuttle-pickup-location.csv) — the raw responses
+- [`synthesis/shuttle-pickup-location.md`](synthesis/shuttle-pickup-location.md) — the synthesized findings
 
 ## Usage
 
