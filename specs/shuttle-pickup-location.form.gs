@@ -1,127 +1,106 @@
 /**
- * Paste this whole file into a new Apps Script project at
- * script.google.com, then run createForm() once. The first run will ask
- * you to authorize it to create a Form in your Drive.
+ * Traveloka UX Survey Generator (FIXED)
+ * Run this script in Google Apps Script (https://script.google.com).
  */
-const SURVEY = {
-  title: "Finding Your Shuttle Pickup Point (Bandung–Jakarta Travelers)",
-  description:
-    "A few quick questions for people who travel between Bandung and Jakarta by shuttle/travel service regularly. This will help us understand whether finding the exact pickup/drop-off point is actually a problem worth fixing. Takes about 2 minutes.",
-  questions: [
-    {
-      type: "LIST",
-      title: "How often do you travel between Bandung and Jakarta by shuttle/travel service?",
-      choices: [
-        "Every week",
-        "A few times a month",
-        "About once a month",
-        "Less often than that"
-      ],
-      required: true
-    },
-    {
-      type: "TEXT",
-      title: "Which shuttle/travel service do you use most often for this route?",
-      required: false
-    },
-    {
-      type: "MULTIPLE_CHOICE",
-      title: "Have you ever had trouble finding the exact pickup point (pool) for your shuttle?",
-      choices: ["Yes, almost every time", "Sometimes", "Rarely", "Never"],
-      required: true
-    },
-    {
-      type: "PARAGRAPH_TEXT",
-      title: "If you have had trouble finding it, what happened? What made it hard to locate?",
-      required: false
-    },
-    {
-      type: "CHECKBOX",
-      title: "What do you currently do to find the pickup point?",
-      choices: [
-        "Call/chat the driver or operator",
-        "Ask friends who've used it before",
-        "Search for it myself on Google Maps",
-        "Rely on landmarks mentioned in the booking",
-        "Just go early and look around",
-        "Other"
-      ],
-      required: true
-    },
-    {
-      type: "MULTIPLE_CHOICE",
-      title: "Have you ever arrived late to the pickup point, or missed your shuttle, because you couldn't find it?",
-      choices: ["Yes, more than once", "Yes, once", "No, never"],
-      required: true
-    },
-    {
-      type: "MULTIPLE_CHOICE",
-      title: "Have you had the same difficulty finding the drop-off point at your destination?",
-      choices: ["Yes, often", "Sometimes", "Rarely", "Never"],
-      required: true
-    },
-    {
-      type: "SCALE",
-      title: "How helpful would it be if the app showed the exact address and a map for the pickup/drop-off point?",
-      lower: 1,
-      upper: 5,
-      lowerLabel: "Not helpful at all",
-      upperLabel: "Extremely helpful",
-      required: true
-    },
-    {
-      type: "CHECKBOX",
-      title: "If the app showed pickup/drop-off location info, which of these would actually help you?",
-      choices: [
-        "Full street address",
-        "A static map thumbnail",
-        "\"Open in Google Maps\" button for directions",
-        "A photo of the pickup point/landmark",
-        "None of these, it's not needed"
-      ],
-      required: true
-    },
-    {
-      type: "PARAGRAPH_TEXT",
-      title: "Anything else about finding pickup/drop-off points you'd want us to know?",
-      required: false
-    }
-  ]
-};
+function createTravelokaSurvey() {
+  // 1. Create the Form
+  var form = FormApp.create('Traveloka Bus & Shuttle Experience Survey (Bandung ↔ Jakarta)');
+  form.setDescription('Help us improve the Traveloka Bus & Shuttle booking experience! If you travel between Bandung and Jakarta using shuttles/buses booked on Traveloka, we’d love 3 minutes of your feedback.');
 
-function createForm() {
-  const form = FormApp.create(SURVEY.title);
-  if (SURVEY.description) form.setDescription(SURVEY.description);
-  SURVEY.questions.forEach(function (question) {
-    addQuestion(form, question);
-  });
+  // --- SECTION 1: Profile ---
+  form.addMultipleChoiceItem()
+    .setTitle('1. How often do you travel between Bandung and Jakarta?')
+    .setRequired(true)
+    .setChoiceValues([
+      '2+ times a week',
+      'Once a week (weekend commuter)',
+      '2–3 times a month',
+      'Once a month or less'
+    ]);
+
+  form.addMultipleChoiceItem()
+    .setTitle('2. How often do you use Traveloka to book your shuttle/bus tickets for this route?')
+    .setRequired(true)
+    .setChoiceValues([
+      'Always (Traveloka is my main app)',
+      'Frequently',
+      'Occasionally (I compare Traveloka with other apps)',
+      'Rarely'
+    ]);
+
+  // --- SECTION 2: Current Experience ---
+  form.addPageBreakItem().setTitle('SECTION 2: Current Experience & Location Friction');
+
+  form.addSectionHeaderItem()
+    .setTitle('📸 Reference Image 1: Shuttle Search Results Card')
+    .setHelpText('Refer to the shuttle options list in Traveloka showing stop names like "Stop Point Pasteur" and "Pasteur Trans Grogol".');
+
+  form.addMultipleChoiceItem()
+    .setTitle('3. When looking at shuttle options on Traveloka (like Image 1), how often are you unsure of the EXACT physical location of the pool?')
+    .setRequired(true)
+    .setChoiceValues([
+      'Always — Pool names like "Stop Point Pasteur" are too vague',
+      'Sometimes — Depends on whether I\'ve been to that pool before',
+      'Rarely — I usually know where the pool is',
+      'Never — I am completely familiar with all stop points'
+    ]);
+
+  form.addMultipleChoiceItem()
+    .setTitle('4. While using Traveloka, do you ever leave the app to search for the pool location on Google Maps or Gojek/Grab before paying?')
+    .setRequired(true)
+    .setChoiceValues([
+      'Yes, almost every time',
+      'Yes, if it\'s an unfamiliar pool name',
+      'No, I just book and figure it out later',
+      'No, I already know the location'
+    ]);
+
+  form.addCheckboxItem()
+    .setTitle('5. Have you ever experienced any of these issues when booking a shuttle on Traveloka?')
+    .setChoiceValues([
+      'Went to the wrong pool (e.g., went to DayTrans Pasteur instead of Pasteur Trans)',
+      'Struggled to order Gojek/Grab to/from the pool because Traveloka didn\'t show the street address',
+      'Arrived late or almost missed the vehicle due to location confusion',
+      'Got dropped off at a spot far from my actual destination in Jakarta/Bandung',
+      'None of the above'
+    ]);
+
+  // --- SECTION 3: Proposed Enhancements ---
+  form.addPageBreakItem().setTitle('SECTION 3: Proposed Enhancements & Feature Validation');
+
+  form.addSectionHeaderItem()
+    .setTitle('📸 Reference Image 3: Current Traveloka Bus Details Page')
+    .setHelpText('Refer to Traveloka\'s Bus Details page showing vehicle specs and policies, but no street address or map pin.');
+
+  form.addGridItem()
+    .setTitle('6. As shown in Image 3, the Bus Details page currently displays vehicle specs and policies. How important is it for Traveloka to add the following location details BEFORE booking?')
+    .setRows([
+      'Full Street Address & Landmark (e.g., Jl. Dr. Djunjunan No. 127, across BTC Mall)',
+      'Interactive Google Maps Pin / Preview directly inside Traveloka',
+      '"Open in Google Maps / Waze" button on the e-ticket & details',
+      '"Set as destination in Gojek / Grab" shortcut'
+    ])
+    .setColumns(['1 (Not needed)', '2', '3', '4', '5 (Must-have)']);
+
+  form.addMultipleChoiceItem()
+    .setTitle('7. Would adding full street addresses and interactive Google Maps make you more likely to book shuttle tickets on Traveloka instead of other platforms?')
+    .setRequired(true)
+    .setChoiceValues([
+      'Yes, definitely',
+      'Probably yes',
+      'No difference / Neutral',
+      'No'
+    ]);
+
+  // --- SECTION 4: Open Feedback ---
+  form.addPageBreakItem().setTitle('SECTION 4: Open Feedback');
+
+  form.addParagraphTextItem()
+    .setTitle('8. What is one feature or information piece Traveloka is currently missing that would make your Bandung ↔ Jakarta commute much easier?');
+
+  Logger.log('==================================================');
+  Logger.log('SUCCESS! Form Created.');
   Logger.log('Edit URL: ' + form.getEditUrl());
   Logger.log('Published URL: ' + form.getPublishedUrl());
-}
-
-function addQuestion(form, question) {
-  const required = !!question.required;
-  switch (question.type) {
-    case 'TEXT':
-      form.addTextItem().setTitle(question.title).setRequired(required);
-      break;
-    case 'PARAGRAPH_TEXT':
-      form.addParagraphTextItem().setTitle(question.title).setRequired(required);
-      break;
-    case 'MULTIPLE_CHOICE':
-      form.addMultipleChoiceItem().setTitle(question.title).setChoiceValues(question.choices).setRequired(required);
-      break;
-    case 'CHECKBOX':
-      form.addCheckboxItem().setTitle(question.title).setChoiceValues(question.choices).setRequired(required);
-      break;
-    case 'LIST':
-      form.addListItem().setTitle(question.title).setChoiceValues(question.choices).setRequired(required);
-      break;
-    case 'SCALE':
-      form.addScaleItem().setTitle(question.title).setBounds(question.lower, question.upper)
-        .setLabels(question.lowerLabel || '', question.upperLabel || '').setRequired(required);
-      break;
-    default:
-      throw new Error('Unsupported question type: ' + question.type);
-  }
+  Logger.log('==================================================');
 }
